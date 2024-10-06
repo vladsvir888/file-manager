@@ -1,6 +1,7 @@
 import os from "os";
 import readline from "readline/promises";
 import Os from "./modules/Os.js";
+import Log from "./modules/Log.js";
 
 class App {
   commands = {
@@ -18,15 +19,18 @@ class App {
   }
 
   sayHello(user) {
-    console.log(`Welcome to the File Manager, ${user}!`);
+    this.modules.log.log(`Welcome to the File Manager, ${user}!`);
   }
 
   sayGoodbye(user) {
-    console.log(`Thank you for using File Manager, ${user}, goodbye!`);
+    this.modules.log.log(`Thank you for using File Manager, ${user}, goodbye!`);
   }
 
   printCurrentWorkingDir() {
-    console.log(`You are currently in ${this.currentWorkingDir}`);
+    this.modules.log.log(
+      `You are currently in ${this.currentWorkingDir}`,
+      "cyan"
+    );
   }
 
   getUsername() {
@@ -57,6 +61,7 @@ class App {
   init() {
     this.modules = {
       os: new Os(),
+      log: new Log(),
     };
 
     this.user = this.getUsername();

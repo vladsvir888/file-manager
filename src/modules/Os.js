@@ -1,7 +1,7 @@
 import os from "os";
 
 class Os {
-  options = {
+  #options = {
     eol: "--EOL",
     cpus: "--cpus",
     homedir: "--homedir",
@@ -11,19 +11,19 @@ class Os {
 
   checkOption(option) {
     switch (option) {
-      case this.options.eol:
+      case this.#options.eol:
         this.printEOL();
         break;
-      case this.options.cpus:
+      case this.#options.cpus:
         this.printCPUsInfo();
         break;
-      case this.options.homedir:
+      case this.#options.homedir:
         this.printHomedir();
         break;
-      case this.options.username:
+      case this.#options.username:
         this.printSystemUsername();
         break;
-      case this.options.architecture:
+      case this.#options.architecture:
         this.printCPUArch();
         break;
       default:
