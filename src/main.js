@@ -3,6 +3,7 @@ import readline from "readline/promises";
 import Os from "./modules/Os.js";
 import Log from "./modules/Log.js";
 import Nwd from "./modules/Nwd.js";
+import Hash from "./modules/Hash.js";
 
 class App {
   commands = {
@@ -11,6 +12,7 @@ class App {
     up: "up",
     cd: "cd",
     ls: "ls",
+    hash: "hash",
   };
 
   constructor() {
@@ -64,6 +66,10 @@ class App {
         const option = input.replace("os ", "");
         this.modules.os.checkOption(option);
         break;
+      case this.commands.hash:
+        const file = input.replace("hash ", "");
+        await this.modules.hash.printHash(file);
+        break;
       default:
         break;
     }
@@ -76,6 +82,7 @@ class App {
       os: new Os(),
       log: new Log(),
       nwd: new Nwd(),
+      hash: new Hash(),
     };
 
     this.user = this.getUsername();
