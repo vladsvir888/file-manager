@@ -2,11 +2,15 @@ import os from "os";
 import readline from "readline/promises";
 import Os from "./modules/Os.js";
 import Log from "./modules/Log.js";
+import Nwd from "./modules/Nwd.js";
 
 class App {
   commands = {
     exit: ".exit",
     os: "os",
+    up: "up",
+    cd: "cd",
+    ls: "ls",
   };
 
   constructor() {
@@ -14,23 +18,22 @@ class App {
   }
 
   handleExit() {
-    this.sayGoodbye(this.user);
+    this.sayGoodbye();
     process.exit();
   }
 
-  sayHello(user) {
-    this.modules.log.log(`Welcome to the File Manager, ${user}!`);
+  sayHello() {
+    this.modules.log.log(`Welcome to the File Manager, ${this.user}!`);
   }
 
-  sayGoodbye(user) {
-    this.modules.log.log(`Thank you for using File Manager, ${user}, goodbye!`);
+  sayGoodbye() {
+    this.modules.log.log(
+      `Thank you for using File Manager, ${this.user}, goodbye!`
+    );
   }
 
   printCurrentWorkingDir() {
-    this.modules.log.log(
-      `You are currently in ${this.currentWorkingDir}`,
-      "cyan"
-    );
+    this.modules.log.log(`You are currently in ${process.cwd()}`, "cyan");
   }
 
   getUsername() {
@@ -40,12 +43,22 @@ class App {
     return user[0].toUpperCase() + user.slice(1);
   }
 
-  checkCommand(input) {
+  async checkCommand(input) {
     const command = input.match(/^[.a-z]+/g)[0];
 
     switch (command) {
       case this.commands.exit:
         this.handleExit();
+        break;
+      case this.commands.up:
+        this.modules.nwd.up();
+        break;
+      case this.commands.cd:
+        const dir = input.replace("cd ", "");
+        await this.modules.nwd.cd(dir);
+        break;
+      case this.commands.ls:
+        await this.modules.nwd.ls();
         break;
       case this.commands.os:
         const option = input.replace("os ", "");
@@ -62,12 +75,14 @@ class App {
     this.modules = {
       os: new Os(),
       log: new Log(),
+      nwd: new Nwd(),
     };
 
     this.user = this.getUsername();
-    this.currentWorkingDir = os.homedir();
 
-    this.sayHello(this.user);
+    process.chdir(os.homedir());
+
+    this.sayHello();
     this.printCurrentWorkingDir();
 
     const rl = readline.createInterface({

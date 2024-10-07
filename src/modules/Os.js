@@ -39,9 +39,10 @@ class Os {
     const cpus = os.cpus();
     const cpusInfo = cpus
       .map((cpu, index) => {
-        return `CPU ${index + 1}. Model: ${cpu.model}. Clock rate: ${(
-          cpu.speed / 1000
-        ).toFixed(2)} GHz`;
+        const clockRate = cpu.model.match(/\d+\.\d+GHz/g);
+        return `CPU ${index + 1}. Model: ${cpu.model}. Clock rate: ${
+          clockRate[0]
+        }`;
       })
       .join("\n");
     console.log(`Overall amount of CPUs: ${cpus.length}\n${cpusInfo}`);
