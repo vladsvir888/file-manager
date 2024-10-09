@@ -4,6 +4,7 @@ import Os from "./modules/Os.js";
 import Log from "./modules/Log.js";
 import Nwd from "./modules/Nwd.js";
 import Hash from "./modules/Hash.js";
+import Helpers from "./modules/Helpers.js";
 
 class App {
   commands = {
@@ -39,10 +40,14 @@ class App {
   }
 
   getUsername() {
-    const user = process.argv
-      .find((arg) => arg.startsWith("--"))
-      .replace("--username=", "");
-    return user[0].toUpperCase() + user.slice(1);
+    const user = process.argv.find((arg) => /^--username=\S+$/.test(arg));
+
+    if (!user) {
+      this.modules.log.log(`${Helpers.messages.incorrectUsername()}`, "red");
+      return "Stranger";
+    }
+
+    return user.replace("--username=", "");
   }
 
   async checkCommand(input) {

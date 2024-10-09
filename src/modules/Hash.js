@@ -18,7 +18,10 @@ class Hash {
     const statFile = await Helpers.getStatFile(pathToFile);
 
     if (!statFile.stat) {
-      this.log.log(`${Helpers.messages.failed}\n${statFile.error}`, "red");
+      this.log.log(
+        `${Helpers.messages.operationFailed}\n${statFile.error}`,
+        "red"
+      );
       return;
     }
 
@@ -27,7 +30,10 @@ class Hash {
       const result = this.calcHash(content);
       console.log(`Hash for file: ${result}`);
     } catch (error) {
-      this.log.log(`${Helpers.messages.failed}\n${error.message}`, "red");
+      this.log.log(
+        `${Helpers.messages.operationFailed}\n${error.message}`,
+        "red"
+      );
     }
   }
 }

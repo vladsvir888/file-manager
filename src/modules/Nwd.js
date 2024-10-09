@@ -19,7 +19,10 @@ class Nwd {
     if (statFile.stat) {
       process.chdir(pathToDir);
     } else {
-      this.log.log(`${Helpers.messages.failed}\n${statFile.error}`, "red");
+      this.log.log(
+        `${Helpers.messages.operationFailed}\n${statFile.error}`,
+        "red"
+      );
     }
   }
 
@@ -55,7 +58,10 @@ class Nwd {
       const output = Object.values(fileSystemElements).flat(1);
       console.table(output);
     } catch (error) {
-      this.log.log(`${Helpers.messages.failed}\n${error.message}`, "red");
+      this.log.log(
+        `${Helpers.messages.operationFailed}\n${error.message}`,
+        "red"
+      );
     }
   }
 }

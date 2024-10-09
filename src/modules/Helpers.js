@@ -17,7 +17,11 @@ const Helpers = {
   },
 
   messages: {
-    failed: "Operation failed",
+    operationFailed: "Operation failed.",
+    invalidInput: "Invalid input.",
+    incorrectUsername() {
+      return `${this.invalidInput} You probably entered the option "--username" incorrectly. The default username is Stranger.`;
+    },
   },
 };
 
