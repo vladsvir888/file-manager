@@ -19,7 +19,7 @@ class Hash {
 
     if (!statFile.stat) {
       this.log.log(
-        `${Helpers.messages.operationFailed}\n${statFile.error}`,
+        `${Helpers.messages.operationFailed} ${statFile.error}`,
         "red"
       );
       return;
@@ -31,7 +31,7 @@ class Hash {
       console.log(`Hash for file: ${result}`);
     } catch (error) {
       this.log.log(
-        `${Helpers.messages.operationFailed}\n${error.message}`,
+        `${Helpers.messages.operationFailed} ${error.message}`,
         "red"
       );
     }

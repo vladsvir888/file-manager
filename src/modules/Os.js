@@ -1,4 +1,6 @@
 import os from "os";
+import Log from "./Log.js";
+import Helpers from "./Helpers.js";
 
 class Os {
   #options = {
@@ -8,6 +10,10 @@ class Os {
     username: "--username",
     architecture: "--architecture",
   };
+
+  constructor() {
+    this.log = new Log();
+  }
 
   checkOption(option) {
     switch (option) {
@@ -27,6 +33,12 @@ class Os {
         this.printCPUArch();
         break;
       default:
+        this.log.log(
+          `${Helpers.messages.invalidInput} ${Helpers.messages.wrongOption(
+            option
+          )}`,
+          "red"
+        );
         break;
     }
   }

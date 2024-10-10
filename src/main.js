@@ -51,7 +51,7 @@ class App {
   }
 
   async checkCommand(input) {
-    const command = input.match(/^[.a-z]+/g)[0];
+    const command = input.match(/^[.a-z]+/g)?.[0];
 
     switch (command) {
       case this.commands.exit:
@@ -61,21 +61,34 @@ class App {
         this.modules.nwd.up();
         break;
       case this.commands.cd:
-        const dir = input.replace("cd ", "");
+        const dir = input.replace("cd ", "").trim();
         await this.modules.nwd.cd(dir);
         break;
       case this.commands.ls:
         await this.modules.nwd.ls();
         break;
       case this.commands.os:
-        const option = input.replace("os ", "");
+        const option = input.replace("os ", "").trim();
         this.modules.os.checkOption(option);
         break;
       case this.commands.hash:
-        const file = input.replace("hash ", "");
+        const file = input.replace("hash ", "").trim();
         await this.modules.hash.printHash(file);
         break;
       default:
+        if (!command) {
+          this.modules.log.log(
+            `${Helpers.messages.invalidInput} ${Helpers.messages.nothingEntered}`,
+            "red"
+          );
+        } else {
+          this.modules.log.log(
+            `${Helpers.messages.invalidInput} ${Helpers.messages.unknownCommand(
+              command
+            )}`,
+            "red"
+          );
+        }
         break;
     }
 

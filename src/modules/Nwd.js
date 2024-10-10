@@ -14,13 +14,12 @@ class Nwd {
 
   async cd(dir) {
     const pathToDir = isAbsolute ? dir : join(process.cwd(), dir);
-    const statFile = await Helpers.getStatFile(pathToDir);
 
-    if (statFile.stat) {
+    try {
       process.chdir(pathToDir);
-    } else {
+    } catch (error) {
       this.log.log(
-        `${Helpers.messages.operationFailed}\n${statFile.error}`,
+        `${Helpers.messages.operationFailed} ${error.message}`,
         "red"
       );
     }
@@ -59,7 +58,7 @@ class Nwd {
       console.table(output);
     } catch (error) {
       this.log.log(
-        `${Helpers.messages.operationFailed}\n${error.message}`,
+        `${Helpers.messages.operationFailed} ${error.message}`,
         "red"
       );
     }

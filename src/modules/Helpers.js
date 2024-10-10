@@ -22,6 +22,9 @@ const Helpers = {
     incorrectUsername() {
       return `${this.invalidInput} You probably entered the option "--username" incorrectly. The default username is Stranger.`;
     },
+    unknownCommand: (command) => `Unknown command "${command}".`,
+    nothingEntered: "You have not entered anything.",
+    wrongOption: (option) => `Wrong option "${option}".`,
   },
 };
 
