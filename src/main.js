@@ -5,6 +5,7 @@ import Log from "./modules/Log.js";
 import Nwd from "./modules/Nwd.js";
 import Hash from "./modules/Hash.js";
 import Helpers from "./modules/Helpers.js";
+import Zip from "./modules/Zip.js";
 
 class App {
   commands = {
@@ -14,6 +15,8 @@ class App {
     cd: "cd",
     ls: "ls",
     hash: "hash",
+    compress: "compress",
+    decompress: "decompress",
   };
 
   constructor() {
@@ -40,7 +43,9 @@ class App {
   }
 
   getUsername() {
-    const user = process.argv.find((arg) => /^--username=\S+$/.test(arg));
+    const user = process.env.npm_config_username
+      ? process.env.npm_config_username
+      : process.argv.find((arg) => /^--username=\S+$/.test(arg));
 
     if (!user) {
       this.modules.log.log(`${Helpers.messages.incorrectUsername()}`, "red");
@@ -51,7 +56,7 @@ class App {
   }
 
   async checkCommand(input) {
-    const command = input.match(/^[.a-z]+/g)?.[0];
+    const command = input.trim().match(/^[.a-z]+/g)?.[0];
 
     switch (command) {
       case this.commands.exit:
@@ -61,19 +66,31 @@ class App {
         this.modules.nwd.up();
         break;
       case this.commands.cd:
-        const dir = input.replace("cd ", "").trim();
+        const dir = Helpers.replaceAndTrim(input);
         await this.modules.nwd.cd(dir);
         break;
       case this.commands.ls:
         await this.modules.nwd.ls();
         break;
       case this.commands.os:
-        const option = input.replace("os ", "").trim();
+        const option = Helpers.replaceAndTrim(input);
         this.modules.os.checkOption(option);
         break;
       case this.commands.hash:
-        const file = input.replace("hash ", "").trim();
+        const file = Helpers.replaceAndTrim(input);
         await this.modules.hash.printHash(file);
+        break;
+      case this.commands.compress:
+      case this.commands.decompress:
+        const files = Helpers.replaceAndTrim(input).split(/\s+/);
+        const [pathToSrc, pathToDest] = files;
+
+        if (command === this.commands.compress) {
+          await this.modules.zip.compress(pathToSrc, pathToDest);
+        } else {
+          await this.modules.zip.decompress(pathToSrc, pathToDest);
+        }
+
         break;
       default:
         if (!command) {
@@ -101,6 +118,7 @@ class App {
       log: new Log(),
       nwd: new Nwd(),
       hash: new Hash(),
+      zip: new Zip(),
     };
 
     this.user = this.getUsername();

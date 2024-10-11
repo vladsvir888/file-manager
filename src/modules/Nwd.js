@@ -1,5 +1,4 @@
 import { readdir } from "fs/promises";
-import { join, isAbsolute } from "path";
 import Log from "./Log.js";
 import Helpers from "./Helpers.js";
 
@@ -13,7 +12,7 @@ class Nwd {
   }
 
   async cd(dir) {
-    const pathToDir = isAbsolute ? dir : join(process.cwd(), dir);
+    const pathToDir = Helpers.getPath(dir);
 
     try {
       process.chdir(pathToDir);

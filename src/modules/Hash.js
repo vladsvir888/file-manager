@@ -1,6 +1,5 @@
 import { createHash } from "crypto";
 import { readFile } from "fs/promises";
-import { join, isAbsolute } from "path";
 import Log from "./Log.js";
 import Helpers from "./Helpers.js";
 
@@ -14,7 +13,7 @@ class Hash {
   }
 
   async printHash(file) {
-    const pathToFile = isAbsolute ? file : join(process.cwd(), file);
+    const pathToFile = Helpers.getPath(file);
     const statFile = await Helpers.getStatFile(pathToFile);
 
     if (!statFile.stat) {

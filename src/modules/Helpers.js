@@ -1,4 +1,5 @@
 import { lstat } from "fs/promises";
+import { isAbsolute, join } from "path";
 
 const Helpers = {
   async getStatFile(path) {
@@ -14,6 +15,14 @@ const Helpers = {
         error: error.message,
       };
     }
+  },
+
+  replaceAndTrim(input) {
+    return input.replace(/(hash|os|cd|compress|decompress)/, "").trim();
+  },
+
+  getPath(path) {
+    return isAbsolute(path) ? join(path) : join(process.cwd(), path);
   },
 
   messages: {
