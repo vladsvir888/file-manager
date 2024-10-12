@@ -6,6 +6,7 @@ import Nwd from "./modules/Nwd.js";
 import Hash from "./modules/Hash.js";
 import Helpers from "./modules/Helpers.js";
 import Zip from "./modules/Zip.js";
+import Fs from "./modules/Fs.js";
 
 class App {
   commands = {
@@ -17,6 +18,12 @@ class App {
     hash: "hash",
     compress: "compress",
     decompress: "decompress",
+    cat: "cat",
+    add: "add",
+    rm: "rm",
+    rn: "rn",
+    cp: "cp",
+    mv: "mv",
   };
 
   constructor() {
@@ -56,7 +63,9 @@ class App {
   }
 
   async checkCommand(input) {
-    const command = input.trim().match(/^[.a-z]+/g)?.[0];
+    let [command, ...rest] = input.match(/(['"])(.*?)\1|\S+/g) || [];
+
+    rest = Helpers.removeQuotes(rest);
 
     switch (command) {
       case this.commands.exit:
@@ -66,24 +75,46 @@ class App {
         this.modules.nwd.up();
         break;
       case this.commands.cd:
-        const dir = Helpers.replaceAndTrim(input);
-        await this.modules.nwd.cd(dir);
+        await this.modules.nwd.cd(rest[0]);
         break;
       case this.commands.ls:
         await this.modules.nwd.ls();
         break;
+      case this.commands.cat:
+        await this.modules.fs.readAndPrintContent(
+          rest[0],
+          this.printCurrentWorkingDir.bind(this)
+        );
+        break;
+      case this.commands.add:
+        await this.modules.fs.createFile(rest[0]);
+        break;
+      case this.commands.rn:
+        const [oldFile, newFile] = rest;
+        await this.modules.fs.renameFile(oldFile, newFile);
+        break;
+      case this.commands.cp: {
+        const [oldPath, newPath] = rest;
+        await this.modules.fs.copyFile(oldPath, newPath);
+        break;
+      }
+      case this.commands.mv: {
+        const [oldPath, newPath] = rest;
+        await this.modules.fs.moveFile(oldPath, newPath);
+        break;
+      }
+      case this.commands.rm:
+        await this.modules.fs.deleteFile(rest[0]);
+        break;
       case this.commands.os:
-        const option = Helpers.replaceAndTrim(input);
-        this.modules.os.checkOption(option);
+        this.modules.os.checkOption(rest[0]);
         break;
       case this.commands.hash:
-        const file = Helpers.replaceAndTrim(input);
-        await this.modules.hash.printHash(file);
+        await this.modules.hash.printHash(rest[0]);
         break;
       case this.commands.compress:
       case this.commands.decompress:
-        const files = Helpers.replaceAndTrim(input).split(/\s+/);
-        const [pathToSrc, pathToDest] = files;
+        const [pathToSrc, pathToDest] = rest;
 
         if (command === this.commands.compress) {
           await this.modules.zip.compress(pathToSrc, pathToDest);
@@ -109,7 +140,9 @@ class App {
         break;
     }
 
-    this.printCurrentWorkingDir();
+    if (command !== this.commands.cat) {
+      this.printCurrentWorkingDir();
+    }
   }
 
   init() {
@@ -119,6 +152,7 @@ class App {
       nwd: new Nwd(),
       hash: new Hash(),
       zip: new Zip(),
+      fs: new Fs(),
     };
 
     this.user = this.getUsername();

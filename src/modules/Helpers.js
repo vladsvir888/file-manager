@@ -17,8 +17,8 @@ const Helpers = {
     }
   },
 
-  replaceAndTrim(input) {
-    return input.replace(/(hash|os|cd|compress|decompress)/, "").trim();
+  removeQuotes(arrPath) {
+    return arrPath.map((path) => path.replace(/^['"]|['"]$/g, ""));
   },
 
   getPath(path) {
@@ -34,6 +34,8 @@ const Helpers = {
     unknownCommand: (command) => `Unknown command "${command}".`,
     nothingEntered: "You have not entered anything.",
     wrongOption: (option) => `Wrong option "${option}".`,
+    createFileOnlyInCurrDir:
+      "You can create a file only in the current directory.",
   },
 };
 

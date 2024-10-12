@@ -1,4 +1,5 @@
 import { readdir } from "fs/promises";
+import { join } from "path";
 import Log from "./Log.js";
 import Helpers from "./Helpers.js";
 
@@ -8,13 +9,12 @@ class Nwd {
   }
 
   up() {
-    process.chdir("../");
+    process.chdir(join("../"));
   }
 
   async cd(dir) {
-    const pathToDir = Helpers.getPath(dir);
-
     try {
+      const pathToDir = Helpers.getPath(dir);
       process.chdir(pathToDir);
     } catch (error) {
       this.log.log(
@@ -32,6 +32,10 @@ class Nwd {
     };
 
     const files = await readdir(process.cwd());
+
+    if (!files.length) {
+      return;
+    }
 
     try {
       for (const name of files) {

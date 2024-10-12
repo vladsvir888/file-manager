@@ -51,9 +51,9 @@ class Os {
     const cpus = os.cpus();
     const cpusInfo = cpus
       .map((cpu, index) => {
-        const clockRate = cpu.model.match(/\d+\.\d+GHz/g);
+        const clockRate = cpu.model.match(/\d+\.\d+GHz/g) || [];
         return `CPU ${index + 1}. Model: ${cpu.model}. Clock rate: ${
-          clockRate[0]
+          clockRate[0] || "Unknown"
         }`;
       })
       .join("\n");
