@@ -55,8 +55,8 @@ class App {
       : process.argv.find((arg) => /^--username=\S+$/.test(arg));
 
     if (!user) {
-      this.modules.log.log(`${Helpers.messages.incorrectUsername()}`, "red");
-      return "Stranger";
+      this.modules.log.log(Helpers.messages.incorrectUsername, "yellow");
+      return "stranger";
     }
 
     return user.replace("--username=", "");

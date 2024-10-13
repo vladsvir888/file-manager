@@ -28,7 +28,6 @@ class Nwd {
     const fileSystemElements = {
       directory: [],
       file: [],
-      unknown: [],
     };
 
     const files = await readdir(process.cwd());
@@ -50,11 +49,15 @@ class Nwd {
           type = "directory";
         } else if (statFile.stat.isFile()) {
           type = "file";
-        } else {
-          type = "unknown";
         }
 
-        fileSystemElements[type].push({ name, type });
+        if (type !== null) {
+          fileSystemElements[type].push({ name, type });
+        }
+      }
+
+      for (const key in fileSystemElements) {
+        fileSystemElements[key].sort((a, b) => a.name.localeCompare(b.name));
       }
 
       const output = Object.values(fileSystemElements).flat(1);

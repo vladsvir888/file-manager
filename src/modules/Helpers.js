@@ -28,14 +28,14 @@ const Helpers = {
   messages: {
     operationFailed: "Operation failed.",
     invalidInput: "Invalid input.",
-    incorrectUsername() {
-      return `${this.invalidInput} You probably entered the option "--username" incorrectly. The default username is Stranger.`;
-    },
+    incorrectUsername:
+      'You probably entered the option "--username" incorrectly. The default username is stranger.',
     unknownCommand: (command) => `Unknown command "${command}".`,
     nothingEntered: "You have not entered anything.",
     wrongOption: (option) => `Wrong option "${option}".`,
     createFileOnlyInCurrDir:
       "You can create a file only in the current directory.",
+    alreadyExists: (path) => `${path} already exists.`,
   },
 };
 

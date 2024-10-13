@@ -1,6 +1,6 @@
 import { createReadStream, createWriteStream } from "fs";
 import { writeFile, rm, rename } from "fs/promises";
-import { isAbsolute, join, basename } from "path";
+import { isAbsolute, join, basename, dirname } from "path";
 import { pipeline } from "stream/promises";
 import Helpers from "./Helpers.js";
 import Log from "./Log.js";
@@ -25,8 +25,11 @@ class Fs {
   }
 
   async createFile(fileName) {
-    if (isAbsolute(fileName)) {
-      this.log.log(Helpers.messages.createFileOnlyInCurrDir, "red");
+    if (isAbsolute(fileName) && process.cwd() !== join(dirname(fileName))) {
+      this.log.log(
+        `${Helpers.messages.operationFailed} ${Helpers.messages.createFileOnlyInCurrDir}`,
+        "red"
+      );
       return;
     }
 
@@ -60,22 +63,36 @@ class Fs {
     try {
       const pathToFile = Helpers.getPath(oldPath);
       const pathToDir = Helpers.getPath(newPath);
+      const newFilePath = join(pathToDir, basename(pathToFile));
+
+      const statFile = await Helpers.getStatFile(newFilePath);
+
+      if (statFile.stat) {
+        throw new Error(Helpers.messages.alreadyExists(newFilePath));
+      }
 
       const rstream = createReadStream(pathToFile);
-      const wstream = createWriteStream(join(pathToDir, basename(pathToFile)));
+      const wstream = createWriteStream(newFilePath);
 
       await pipeline(rstream, wstream);
+
+      return true;
     } catch (error) {
       this.log.log(
         `${Helpers.messages.operationFailed} ${error.message}`,
         "red"
       );
+
+      return false;
     }
   }
 
   async moveFile(oldPath, newPath) {
-    await this.copyFile(oldPath, newPath);
-    await this.deleteFile(oldPath);
+    const copyResult = await this.copyFile(oldPath, newPath);
+
+    if (copyResult) {
+      await this.deleteFile(oldPath);
+    }
   }
 
   async deleteFile(file) {
