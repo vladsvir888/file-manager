@@ -1,15 +1,26 @@
 import os from "os";
 import readline from "readline/promises";
-import Os from "./modules/Os.js";
-import Log from "./modules/Log.js";
-import Nwd from "./modules/Nwd.js";
-import Hash from "./modules/Hash.js";
-import Helpers from "./modules/Helpers.js";
-import Zip from "./modules/Zip.js";
-import Fs from "./modules/Fs.js";
+import Os from "./modules/Os";
+import Log from "./modules/Log";
+import Nwd from "./modules/Nwd";
+import Hash from "./modules/Hash";
+import Helpers from "./modules/Helpers";
+import Zip from "./modules/Zip";
+import Fs from "./modules/Fs";
 
-class App {
-  commands = {
+type Modules = {
+  os: Os;
+  log: Log;
+  nwd: Nwd;
+  hash: Hash;
+  zip: Zip;
+  fs: Fs;
+};
+
+class FileManager {
+  private modules!: Modules;
+  private user!: string;
+  private commands = {
     exit: ".exit",
     os: "os",
     up: "up",
@@ -30,26 +41,26 @@ class App {
     this.init();
   }
 
-  handleExit() {
+  private handleExit(): void {
     this.sayGoodbye();
     process.exit();
   }
 
-  sayHello() {
+  private sayHello(): void {
     this.modules.log.log(`Welcome to the File Manager, ${this.user}!`);
   }
 
-  sayGoodbye() {
+  private sayGoodbye(): void {
     this.modules.log.log(
       `Thank you for using File Manager, ${this.user}, goodbye!`
     );
   }
 
-  printCurrentWorkingDir() {
+  private printCurrentWorkingDir(): void {
     this.modules.log.log(`You are currently in ${process.cwd()}`, "cyan");
   }
 
-  getUsername() {
+  private getUsername(): string {
     const user = process.env.npm_config_username
       ? process.env.npm_config_username
       : process.argv.find((arg) => /^--username=\S+$/.test(arg));
@@ -62,7 +73,7 @@ class App {
     return user.replace("--username=", "");
   }
 
-  async checkCommand(input) {
+  private async checkCommand(input: string): Promise<void> {
     let [command, ...rest] = input.match(/(['"])(.*?)\1|\S+/g) || [];
 
     rest = Helpers.removeQuotes(rest);
@@ -145,7 +156,18 @@ class App {
     }
   }
 
-  init() {
+  private changeDirectory(): void {
+    try {
+      process.chdir(os.homedir());
+    } catch {
+      this.modules.log.log(
+        `${Helpers.messages.operationFailed} ${Helpers.messages.errorChangeDir}`,
+        "red"
+      );
+    }
+  }
+
+  private init(): void {
     this.modules = {
       os: new Os(),
       log: new Log(),
@@ -157,8 +179,7 @@ class App {
 
     this.user = this.getUsername();
 
-    process.chdir(os.homedir());
-
+    this.changeDirectory();
     this.sayHello();
     this.printCurrentWorkingDir();
 
@@ -172,4 +193,4 @@ class App {
   }
 }
 
-new App();
+new FileManager();

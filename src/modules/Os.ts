@@ -1,9 +1,10 @@
 import os from "os";
-import Log from "./Log.js";
-import Helpers from "./Helpers.js";
+import Log from "./Log";
+import Helpers from "./Helpers";
 
 class Os {
-  #options = {
+  private log: Log;
+  private options = {
     eol: "--EOL",
     cpus: "--cpus",
     homedir: "--homedir",
@@ -15,21 +16,21 @@ class Os {
     this.log = new Log();
   }
 
-  checkOption(option) {
+  public checkOption(option: string): void {
     switch (option) {
-      case this.#options.eol:
+      case this.options.eol:
         this.printEOL();
         break;
-      case this.#options.cpus:
+      case this.options.cpus:
         this.printCPUsInfo();
         break;
-      case this.#options.homedir:
+      case this.options.homedir:
         this.printHomedir();
         break;
-      case this.#options.username:
+      case this.options.username:
         this.printSystemUsername();
         break;
-      case this.#options.architecture:
+      case this.options.architecture:
         this.printCPUArch();
         break;
       default:
@@ -43,11 +44,11 @@ class Os {
     }
   }
 
-  printEOL() {
-    console.log(`Default system End-Of-Line: ${JSON.stringify(os.EOL)}`);
+  private printEOL(): void {
+    this.log.log(`Default system End-Of-Line: ${JSON.stringify(os.EOL)}`);
   }
 
-  printCPUsInfo() {
+  private printCPUsInfo(): void {
     const cpus = os.cpus();
     const cpusInfo = cpus
       .map((cpu, index) => {
@@ -57,19 +58,19 @@ class Os {
         }`;
       })
       .join("\n");
-    console.log(`Overall amount of CPUs: ${cpus.length}\n${cpusInfo}`);
+    this.log.log(`Overall amount of CPUs: ${cpus.length}\n${cpusInfo}`);
   }
 
-  printHomedir() {
-    console.log(`Home directory: ${os.homedir()}`);
+  private printHomedir(): void {
+    this.log.log(`Home directory: ${os.homedir()}`);
   }
 
-  printSystemUsername() {
-    console.log(`System user name: ${os.userInfo().username}`);
+  private printSystemUsername(): void {
+    this.log.log(`System user name: ${os.userInfo().username}`);
   }
 
-  printCPUArch() {
-    console.log(`CPU architecture: ${os.arch()}`);
+  private printCPUArch(): void {
+    this.log.log(`CPU architecture: ${os.arch()}`);
   }
 }
 

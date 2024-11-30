@@ -2,15 +2,20 @@ import { createReadStream, createWriteStream } from "fs";
 import { writeFile, rm, rename } from "fs/promises";
 import { isAbsolute, join, basename, dirname } from "path";
 import { pipeline } from "stream/promises";
-import Helpers from "./Helpers.js";
-import Log from "./Log.js";
+import Helpers from "./Helpers";
+import Log from "./Log";
 
 class Fs {
+  private log: Log;
+
   constructor() {
     this.log = new Log();
   }
 
-  async readAndPrintContent(file, cb) {
+  public async readAndPrintContent(
+    file: string,
+    cb: () => void
+  ): Promise<void> {
     const pathToFile = Helpers.getPath(file);
     const rstream = createReadStream(pathToFile, { encoding: "utf-8" });
 
@@ -24,7 +29,7 @@ class Fs {
     );
   }
 
-  async createFile(fileName) {
+  public async createFile(fileName: string): Promise<void> {
     if (isAbsolute(fileName) && process.cwd() !== join(dirname(fileName))) {
       this.log.log(
         `${Helpers.messages.operationFailed} ${Helpers.messages.createFileOnlyInCurrDir}`,
@@ -38,28 +43,32 @@ class Fs {
 
       await writeFile(pathToFile, "", { flag: "wx" });
     } catch (error) {
-      this.log.log(
-        `${Helpers.messages.operationFailed} ${error.message}`,
-        "red"
-      );
+      if (error instanceof Error) {
+        this.log.log(
+          `${Helpers.messages.operationFailed} ${error.message}`,
+          "red"
+        );
+      }
     }
   }
 
-  async renameFile(oldFile, newFile) {
+  public async renameFile(oldFile: string, newFile: string): Promise<void> {
     try {
       const pathToOldFile = Helpers.getPath(oldFile);
       const pathToNewFile = Helpers.getPath(newFile);
 
       await rename(pathToOldFile, pathToNewFile);
     } catch (error) {
-      this.log.log(
-        `${Helpers.messages.operationFailed} ${error.message}`,
-        "red"
-      );
+      if (error instanceof Error) {
+        this.log.log(
+          `${Helpers.messages.operationFailed} ${error.message}`,
+          "red"
+        );
+      }
     }
   }
 
-  async copyFile(oldPath, newPath) {
+  public async copyFile(oldPath: string, newPath: string): Promise<boolean> {
     try {
       const pathToFile = Helpers.getPath(oldPath);
       const pathToDir = Helpers.getPath(newPath);
@@ -78,16 +87,18 @@ class Fs {
 
       return true;
     } catch (error) {
-      this.log.log(
-        `${Helpers.messages.operationFailed} ${error.message}`,
-        "red"
-      );
+      if (error instanceof Error) {
+        this.log.log(
+          `${Helpers.messages.operationFailed} ${error.message}`,
+          "red"
+        );
+      }
 
       return false;
     }
   }
 
-  async moveFile(oldPath, newPath) {
+  public async moveFile(oldPath: string, newPath: string): Promise<void> {
     const copyResult = await this.copyFile(oldPath, newPath);
 
     if (copyResult) {
@@ -95,16 +106,18 @@ class Fs {
     }
   }
 
-  async deleteFile(file) {
+  public async deleteFile(file: string): Promise<void> {
     try {
       const pathToFile = Helpers.getPath(file);
 
       await rm(pathToFile);
     } catch (error) {
-      this.log.log(
-        `${Helpers.messages.operationFailed} ${error.message}`,
-        "red"
-      );
+      if (error instanceof Error) {
+        this.log.log(
+          `${Helpers.messages.operationFailed} ${error.message}`,
+          "red"
+        );
+      }
     }
   }
 }

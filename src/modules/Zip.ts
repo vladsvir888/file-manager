@@ -2,28 +2,33 @@ import { createBrotliCompress, createBrotliDecompress } from "zlib";
 import { createReadStream, createWriteStream } from "fs";
 import { pipeline } from "stream/promises";
 import { join, basename } from "path";
-import Helpers from "./Helpers.js";
-import Log from "./Log.js";
+import Helpers from "./Helpers";
+import Log from "./Log";
 
 class Zip {
-  #operations = {
-    comp: "compress",
-    decomp: "decompress",
-  };
+  private log: Log;
+  private operations = {
+    compress: "compress",
+    decompress: "decompress",
+  } as const;
 
   constructor() {
     this.log = new Log();
   }
 
-  async #execute(operation, src, dest) {
+  private async execute(
+    operation: keyof typeof this.operations,
+    src: string,
+    dest: string
+  ): Promise<void> {
     try {
       const pathToSrc = Helpers.getPath(src);
       const pathToDest = Helpers.getPath(dest);
 
       const isCurrentDirDest = dest === ".";
-      let preparedPathToDest;
+      let preparedPathToDest: string | undefined;
 
-      if (operation === this.#operations.comp) {
+      if (operation === this.operations.compress) {
         preparedPathToDest = isCurrentDirDest
           ? join(pathToDest, `${basename(pathToSrc)}.br`)
           : pathToDest;
@@ -37,25 +42,27 @@ class Zip {
       const wstream = createWriteStream(preparedPathToDest);
 
       const compressOrDecompress =
-        operation === this.#operations.comp
+        operation === this.operations.compress
           ? createBrotliCompress
           : createBrotliDecompress;
 
       await pipeline(rstream, compressOrDecompress(), wstream);
     } catch (error) {
-      this.log.log(
-        `${Helpers.messages.operationFailed} ${error.message}`,
-        "red"
-      );
+      if (error instanceof Error) {
+        this.log.log(
+          `${Helpers.messages.operationFailed} ${error.message}`,
+          "red"
+        );
+      }
     }
   }
 
-  async compress(src, dest) {
-    this.#execute(this.#operations.comp, src, dest);
+  public async compress(src: string, dest: string): Promise<void> {
+    this.execute(this.operations.compress, src, dest);
   }
 
-  async decompress(src, dest) {
-    this.#execute(this.#operations.decomp, src, dest);
+  public async decompress(src: string, dest: string): Promise<void> {
+    this.execute(this.operations.decompress, src, dest);
   }
 }
 

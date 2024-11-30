@@ -1,27 +1,31 @@
+import { Stats } from "fs";
 import { lstat } from "fs/promises";
 import { isAbsolute, join } from "path";
 
 const Helpers = {
-  async getStatFile(path) {
+  async getStatFile(path: string): Promise<{
+    stat: Stats | undefined;
+    error: string | undefined;
+  }> {
     try {
       const stat = await lstat(path);
       return {
         stat,
-        error: null,
+        error: undefined,
       };
     } catch (error) {
       return {
-        stat: null,
-        error: error.message,
+        stat: undefined,
+        error: error instanceof Error ? error.message : undefined,
       };
     }
   },
 
-  removeQuotes(arrPath) {
+  removeQuotes(arrPath: string[]): string[] {
     return arrPath.map((path) => path.replace(/^['"]|['"]$/g, ""));
   },
 
-  getPath(path) {
+  getPath(path: string): string {
     return isAbsolute(path) ? join(path) : join(process.cwd(), path);
   },
 
@@ -30,12 +34,14 @@ const Helpers = {
     invalidInput: "Invalid input.",
     incorrectUsername:
       'You probably entered the option "--username" incorrectly. The default username is stranger.',
-    unknownCommand: (command) => `Unknown command "${command}".`,
+    unknownCommand: (command: string): string =>
+      `Unknown command "${command}".`,
     nothingEntered: "You have not entered anything.",
-    wrongOption: (option) => `Wrong option "${option}".`,
+    wrongOption: (option: string): string => `Wrong option "${option}".`,
     createFileOnlyInCurrDir:
       "You can create a file only in the current directory.",
-    alreadyExists: (path) => `${path} already exists.`,
+    alreadyExists: (path: string): string => `${path} already exists.`,
+    errorChangeDir: "Error while changing directory.",
   },
 };
 
